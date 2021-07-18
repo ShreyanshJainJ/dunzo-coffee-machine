@@ -1,4 +1,4 @@
-
+from coffee_machine.controllers import store_log
 import asyncio
 import time
 from asyncio import Queue
@@ -22,9 +22,9 @@ async def request_beverage(drink_type: str) -> None:
             drink_type=drink_type, drink_details=drink_details
         )
         # assuming constant time for all drinks to be prepared
-        await _prepare_beverage(drink_type=drink_type)
+        return await _prepare_beverage(drink_type=drink_type)
     except CMError as error:
-        print(str(error))
+        return _provide_reject_feedback(exception=error)
 
 
 def _provide_reject_feedback(exception: str) -> None:
@@ -34,7 +34,7 @@ def _provide_reject_feedback(exception: str) -> None:
     Args:
         exception (str): [description]
     """
-    print(exception)
+    return str(exception)
 
 
 async def _prepare_beverage(drink_type: str) -> None:
@@ -44,10 +44,10 @@ async def _prepare_beverage(drink_type: str) -> None:
         drink_type (str): [description]
     """
     await asyncio.sleep(TIME_TO_PREPARE_BREVERAGE)
-    print(f"{drink_type} is prepared")
+    return f"{drink_type} is prepared"
 
 
-async def init_parallel_outlets(queue: Queue):
+async def init_parallel_outlets(queue: Queue, console_print: bool):
     """Parallel handling capacity based on the
     number of outlet defined in config.
     Works based on asyncio Queue and outlets defined
@@ -60,6 +60,9 @@ async def init_parallel_outlets(queue: Queue):
         # wait until request posted
         drink_requested = await queue.get()
         # create drink
-        await request_beverage(drink_requested)
+        result = await request_beverage(drink_requested)
+        if console_print:
+            print(result)
+        store_log(result=result)
         # compelete the task
         queue.task_done()

@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, List
 
-from coffee_machine.config.machine_interface import (INGREDIENT_LOW_THRESHOLD,
-                                                     INVENTORY_CONFIG)
+from coffee_machine.config.machine_interface import INGREDIENT_LOW_THRESHOLD
 from coffee_machine.exception.exceptions import (InventoryInSufficient,
                                                  InventoryUnavailable)
 from coffee_machine.services.drink import Beverages
@@ -96,6 +95,14 @@ class IngredientsInventory(metaclass=SingletonMeta):
 
     def __init__(self, inital_inventory: Inventory):
         self._inventory = inital_inventory
+    
+    @property
+    def get_ingredients(self) -> List[str]:
+        return self._inventory.get_all_ingredients()
+    
+    @property
+    def get_inventory(self) -> Inventory:
+        return self._inventory
 
     def ingredients_running_low(self, machine_details: Machine) -> List[str]:
         """Returns all the ingredients which are below a threshold
